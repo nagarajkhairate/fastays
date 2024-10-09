@@ -1,13 +1,14 @@
 pipeline {
     agent any
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
         GITHUB_CREDENTIALS = credentials('github-credentials')
+        DOCKERHUB_USERNAME = nagarajkhairate
+        DOCKERHUB_PASSWORD = 8497049nN@
     }
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/nagarajkhairate/fastays.git'
+                git branch: 'main', credentialsId: 'GITHUB_CREDENTIALS', url: 'https://github.com/nagarajkhairate/fastays.git'
             }
         }
         stage('Build Frontend') {
@@ -27,20 +28,18 @@ pipeline {
         stage('Push Frontend') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        def frontendImage = docker.image('my-frontend')
-                        frontendImage.push('latest')
-                    }
+                    sh "echo ${env.DOCKERHUB_PASSWORD} | docker login -u ${env.DOCKERHUB_USERNAME} --password-stdin"
+                    def frontendImage = docker.image('my-frontend')
+                    frontendImage.push('latest')
                 }
             }
         }
         stage('Push Backend') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        def backendImage = docker.image('my-backend')
-                        backendImage.push('latest')
-                    }
+                    sh "echo ${env.DOCKERHUB_PASSWORD} | docker login -u ${env.DOCKERHUB_USERNAME} --password-stdin"
+                    def backendImage = docker.image('my-backend')
+                    backendImage.push('latest')
                 }
             }
         }
